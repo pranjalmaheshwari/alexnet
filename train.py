@@ -49,9 +49,12 @@ print "Data loaded in time : ", (time.time()-start_time)
 
 start_time = time.time()
 
+net = alexnet()
+net.cuda()
+models_saved = 0
+
 if(len(sys.argv) == 5):
-	net = torch.load(sys.argv[3])
-	net.cuda()
+	net.load_state_dict(torch.load(sys.argv[3]))
 	models_saved = int(sys.argv[4])
 	accuracy_train, accuracy_top_k_train, total_train = accuracy(train, input_path, net)
 	accuracy_validation, accuracy_top_k_validation, total_validation = accuracy(validation, input_path, net)
@@ -60,10 +63,8 @@ if(len(sys.argv) == 5):
 			( accuracy_train, accuracy_validation, accuracy_test, 
 			accuracy_top_k_train, accuracy_top_k_validation, accuracy_top_k_test,
 			total_train+total_validation+total_test))
-else:
-	net = alexnet()
-	net.cuda()
-	models_saved = 0
+
+	
 
 print "alexnet in time : ", (time.time()-start_time)
 sys.stdout.flush()
@@ -120,7 +121,7 @@ for epoch in range(1, epochs):  # loop over the dataset multiple times
 				(it, accuracy_train, accuracy_validation, accuracy_test, 
 				accuracy_top_k_train, accuracy_top_k_validation, accuracy_top_k_test,
 				total_train+total_validation+total_test))
-		torch.save(net, output_file_path+'_'+str(models_saved))
+		torch.save(net.state_dict(), output_file_path+'_'+str(models_saved))
 		sys.stdout.flush()
 		models_saved += 1
 		running_loss = 0.0
@@ -135,7 +136,7 @@ print('%d , train:, %.4f, validation:, %.4f, test:, %.4f , train:, %.4f, validat
 		(it, accuracy_train, accuracy_validation, accuracy_test, 
 		accuracy_top_k_train, accuracy_top_k_validation, accuracy_top_k_test,
 		total_train+total_validation+total_test))
-torch.save(net, output_file_path+'_'+str(models_saved))
+torch.save(net.state_dict(), output_file_path+'_'+str(models_saved))
 sys.stdout.flush()
 models_saved += 1
 print_time += time.time()-temp_time
